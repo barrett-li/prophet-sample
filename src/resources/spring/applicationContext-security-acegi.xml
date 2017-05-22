@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+	default-autowire="byName" default-lazy-init="true">
+
+	<bean id="filterChainProxy" class="org.acegisecurity.util.FilterChainProxy">
+		<property name="filterInvocationDefinitionSource">
+			<value>
+				CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+				PATTERN_TYPE_APACHE_ANT
+				/**=httpSessionContextIntegrationFilter,logoutFilter,authenticationProcessingFilter,securityContextHolderAwareRequestFilter,anonymousProcessingFilter,exceptionTranslationFilter,filterInvocationInterceptor
+			</value>
+		</property>
+	</bean>
+
+	<bean id="httpSessionContextIntegrationFilter" class="org.acegisecurity.context.HttpSessionContextIntegrationFilter" />
+
+	<bean id="logoutFilter" class="org.acegisecurity.ui.logout.LogoutFilter">
+		<constructor-arg value="/pages/logoutSuccess.jsp" />
+		<constructor-arg>
+			<list>
+				<bean class="org.acegisecurity.ui.logout.SecurityContextLogoutHandler" />
+			</list>
+		</constructor-arg>
+		<property name="filterProcessesUrl" value="/j_acegi_logout" />
+	</bean>
+
+	<bean id="authenticationProcessingFilter" class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilter">
+		<property name="authenticationManager" ref="authenticationManager" />
+		<property name="authenticationFailureUrl" value="/pages/login.jsp?login_error=1" />
+		<property name="defaultTargetUrl" value="/pages/frame/frame.jsp" />
+		<property name="filterProcessesUrl" value="/j_acegi_security_check" />
+	</bean>
+
+	<bean id="securityContextHolderAwareRequestFilter" class="org.acegisecurity.wrapper.SecurityContextHolderAwareRequestFilter" />
+
+	<bean id="anonymousProcessingFilter" class="org.acegisecurity.providers.anonymous.AnonymousProcessingFilter">
+		<property name="key" value="changeThis" />
+		<property name="userAttribute" value="anonymousUser,AUTH_ANONYMOUS" />
+	</bean>
+
+	<bean id="exceptionTranslationFilter" class="org.acegisecurity.ui.ExceptionTranslationFilter">
+		<property name="authenticationEntryPoint">
+			<bean class="org.acegisecurity.ui.webapp.AuthenticationProcessingFilterEntryPoint">
+				<property name="loginFormUrl" value="/pages/login.jsp" />
+			</bean>
+		</property>
+		<property name="accessDeniedHandler">
+			<bean class="org.acegisecurity.ui.AccessDeniedHandlerImpl">
+				<property name="errorPage" value="/pages/accessDenied.jsp" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="filterInvocationInterceptor" class="org.acegisecurity.intercept.web.FilterSecurityInterceptor">
+		<property name="authenticationManager" ref="authenticationManager" />
+		<property name="accessDecisionManager" ref="accessDecisionManager" />
+		<property name="objectDefinitionSource" ref="filterDefinitionSource" />
+	</bean>
+
+	<bean id="filterDefinitionSource" class="com.resoft.prophet.security.acegi.intercept.web.FilterInvocationDefinitionSource">
+		<property name="convertUrlToLowercaseBeforeComparison" value="true" />
+		<property name="useAntPath" value="true" />
+		<property name="resourceProvider" ref="resourceProvider" />
+	</bean>
+
+	<bean id="resourceProvider" class="com.resoft.prophet.security.acegi.resourcedetails.ResourceProviderImpl" init-method="init">
+		<property name="securityService" ref="securityService" />
+		<property name="resourceCache" ref="resourceCache" />
+	</bean>
+
+	<bean id="authenticationManager" class="org.acegisecurity.providers.ProviderManager">
+		<property name="providers">
+			<list>
+				<ref local="daoAuthenticationProvider" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="accessDecisionManager" class="org.acegisecurity.vote.AffirmativeBased">
+		<property name="allowIfAllAbstainDecisions" value="false" />
+		<property name="decisionVoters">
+			<list>
+				<bean class="org.acegisecurity.vote.RoleVoter">
+					<property name="rolePrefix" value="AUTH_" />
+				</bean>
+				<bean class="org.acegisecurity.vote.AuthenticatedVoter" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="daoAuthenticationProvider" class="org.acegisecurity.providers.dao.DaoAuthenticationProvider">
+		<property name="userDetailsService" ref="userDetailsService" />
+		<property name="userCache" ref="userCache" />
+		<property name="passwordEncoder" ref="passwordEncoder" />
+		<property name="saltSource" ref="saltSource" />
+	</bean>
+	
+	<bean id="passwordEncoder" class="org.acegisecurity.providers.encoding.ShaPasswordEncoder">
+		<constructor-arg value="256" />
+		<property name="encodeHashAsBase64" value="true" />
+	</bean>
+   	
+	<bean id="saltSource" class="org.acegisecurity.providers.dao.salt.SystemWideSaltSource">
+		<property name="systemWideSalt" value="prophet" />
+	</bean>
+   	
+	<bean id="userDetailsService" class="com.resoft.prophet.security.acegi.userdetails.UserDetailsServiceImpl">
+		<property name="securityService" ref="securityService" />
+	</bean>
+
+	<bean id="methodSecurityInterceptor" class="org.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+		<property name="authenticationManager" ref="authenticationManager" />
+		<property name="accessDecisionManager" ref="accessDecisionManager" />
+		<property name="objectDefinitionSource" ref="methodDefinitionSource" />
+	</bean>
+
+	<bean id="methodDefinitionSource" class="com.resoft.prophet.security.acegi.intercept.method.MethodDefinitionSource">
+		<property name="resourceProvider" ref="resourceProvider" />
+	</bean>
+
+	<bean id="userCache" class="org.acegisecurity.providers.dao.cache.EhCacheBasedUserCache">
+		<property name="cache">
+			<bean class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+				<property name="cacheManager" ref="cacheManager" />
+				<property name="cacheName" value="userCache" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="resourceCache" class="com.resoft.prophet.security.acegi.resourcedetails.ResourceCache">
+		<property name="cache">
+			<bean id="resourceCacheBackend" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+				<property name="cacheManager" ref="cacheManager" />
+				<property name="cacheName" value="resourceCache" />
+			</bean>
+		</property>
+	</bean>
+
+	<!-- This bean is optional; it isn't used by any other bean as it only listens and logs -->
+	<bean id="loggerListener" class="org.acegisecurity.event.authentication.LoggerListener" />
+</beans>

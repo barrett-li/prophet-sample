@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE xwork PUBLIC "-//OpenSymphony Group//XWork 1.1.1//EN" "http://www.opensymphony.com/xwork/xwork-1.1.1.dtd">
+<xwork>
+	<package name="security" extends="default" namespace="/security">
+
+		<action name="setUserPassword" class="setUserPasswordAction">
+			<result name="success">/pages/security/setUserPassword.jsp</result>
+		</action>
+
+	</package>
+</xwork>

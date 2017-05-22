@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+	default-autowire="byName" default-lazy-init="true">
+	
+	<bean id="barChart3DProcessor" class="com.resoft.prophet.charts.sample.BarChart3DProcessor"/>
+	<bean id="pieChart3DProcessor" class="com.resoft.prophet.charts.sample.PieChart3DProcessor"/>
+	
+	<bean id="barChart3DTemplate" class="com.resoft.prophet.charts.sample.BarChart3DTemplate" scope="prototype">
+		<property name="chartProcessor" ref="barChart3DProcessor" />
+		<property name="chartImageInfoFactory" ref="chartImageInfoFactory" />
+	</bean>
+	
+	<bean id="pieChart3DTemplate" class="com.resoft.prophet.charts.sample.PieChart3DTemplate" scope="prototype">
+		<property name="chartProcessor" ref="pieChart3DProcessor" />
+		<property name="chartImageInfoFactory" ref="chartImageInfoFactory" />
+	</bean>
+
+	<bean id="bankLoanDAO" class="com.resoft.prophet.charts.sample.dao.BankLoanDAO">
+		<property name="sqlMapClient" ref="sqlMapClient" />
+	</bean>
+
+	<bean id="chartsDataService" class="com.resoft.prophet.charts.sample.service.ChartsDataServiceImpl">
+		<property name="bankLoanDAO" ref="bankLoanDAO" />
+	</bean>
+
+	<bean id="chartsDataDWRService" class="com.resoft.prophet.charts.sample.web.ChartsDataDWRService">
+		<property name="chartsDataService" ref="chartsDataService" />
+		<property name="barChart3DTemplate" ref="barChart3DTemplate" />
+		<property name="pieChart3DTemplate" ref="pieChart3DTemplate" />
+	</bean>
+
+	<bean id="sampleBarChart3DAction" class="com.resoft.prophet.charts.sample.web.SampleBarChart3DAction" scope="prototype">
+		<property name="chartTemplate" ref="barChart3DTemplate" />
+	</bean>
+	
+	<bean id="column2DAction" class="com.resoft.prophet.charts.sample.web.Column2DAction" scope="prototype"/>
+	
+</beans>

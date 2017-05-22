@@ -1,0 +1,65 @@
+/**
+ * Prophet 1.0
+ * CHINA RESOFT COMPUTER SYSTEM ENGINEERING CO.,LTD
+ * 
+ * http://resoft.css.com.cn
+ */
+
+body {
+	font-family: verdana, tahoma, helvetica;
+	padding: 15px;
+	font-size: 13px;
+	background-color: #fff !important;
+}
+
+p {
+	margin-bottom: 15px;
+}
+
+h1 {
+	font-size: large;
+	margin-bottom: 20px;
+}
+
+h2 {
+	font-size: 14px;
+	color: #333;
+	font-weight: bold;
+	margin: 10px 0;
+}
+
+td {
+	font-size: 13px;
+}
+
+.p-form-icon {
+	background-image:url(../images/icons/fam/application_view_list.png) !important;
+}
+
+.p-grid-icon {
+    background-image:url(../images/icons/fam/grid.png) !important;
+}
+
+.p-btn-icon-add {
+	background: url(../images/icons/fam/add.gif) no-repeat 0 2px !important;
+}
+
+.p-btn-icon-excel {
+	background: url(../images/icons/fam/excel.gif) !important;
+}
+
+.p-menu-icon-view {
+	background: url(../images/icons/tasks/details.gif) !important;
+}
+
+.p-menu-icon-edit {
+	background: url(../images/icons/tasks/edit.gif) !important;
+}
+
+.p-menu-icon-delete {
+	background: url(../images/icons/fam/delete.gif) !important;
+}
+
+.p-chart-icon {
+	 background-image:url(../images/icons/fam/chart.gif) !important;
+}

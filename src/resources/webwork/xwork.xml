@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE xwork PUBLIC "-//OpenSymphony Group//XWork 1.1.1//EN" "http://www.opensymphony.com/xwork/xwork-1.1.1.dtd">
+<xwork>
+	<!-- Include webwork defaults (from WebWork JAR). -->
+	<include file="webwork-default.xml" />
+	
+	<!-- Configuration for the default package. -->
+	<package name="default" extends="webwork-default">
+		
+		<!-- Configuration for the global exception. -->
+		<global-results>
+			<result name="exception">/pages/error.jsp</result>
+			<result name="runtimeException">/pages/error.jsp</result>
+			<result name="businessException">/pages/warning.jsp</result>
+		</global-results>
+		
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception" result="exception" />
+			<exception-mapping exception="java.lang.RuntimeException" result="runtimeException" />
+			<exception-mapping exception="com.resoft.prophet.exception.BusinessException" result="businessException" />
+		</global-exception-mappings>
+		
+	</package>
+	
+	<!-- Configuration for the Actions. -->
+	<include file="xwork-charts.xml" ></include>
+	<include file="xwork-org.xml" ></include>
+	<include file="xwork-upload.xml" ></include>
+	<include file="xwork-log.xml" ></include>
+	<include file="xwork-security.xml" ></include>
+</xwork>

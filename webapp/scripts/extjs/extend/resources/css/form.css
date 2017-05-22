@@ -1,0 +1,15 @@
+/**
+ * Ext JS Library 2.0 Extend
+ * BaseBox Widget Libraries
+ * weihaihan@gmail.com
+ *
+ * http://sourceforge.net/projects/basebox
+ */ 
+ 
+ /* ---- label fields ---- */
+.x-form-label {
+	height: 22px;
+	line-height: 18px;
+	vertical-align: middle;
+	margin-top: 1px; /* ie bogus margin bug */
+}

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE xwork PUBLIC "-//OpenSymphony Group//XWork 1.1.1//EN" "http://www.opensymphony.com/xwork/xwork-1.1.1.dtd">
+<xwork>
+    <package name="charts" extends="default" namespace="/charts">
+    
+		<action name="column2D" class="column2DAction">
+			<result name="success" type="stream"/>
+		</action>
+		
+		<action name="sampleBarChart3D" class="sampleBarChart3DAction">
+			<result name="success">/pages/charts/sampleBarChart3D.jsp</result>
+		</action>
+		
+    </package>
+</xwork>

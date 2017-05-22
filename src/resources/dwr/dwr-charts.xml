@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dwr PUBLIC "-//GetAhead Limited//DTD Direct Web Remoting 2.0//EN" "http://getahead.ltd.uk/dwr/dwr20.dtd">
+
+<dwr>
+	<allow>
+		<create creator="spring" javascript="chartsDataDWRService">
+			<param name="beanName" value="chartsDataDWRService" />
+		</create>
+
+		<convert converter="bean" match="com.resoft.prophet.charts.sample.domain.BankLoan" />
+		<convert converter="bean" match="com.resoft.prophet.charts.jfreechart.ChartImageInfo" />
+	</allow>
+	<signatures>
+		<![CDATA[
+			import java.util.Map;
+			
+			chartsDataDWRService.getBankLoansDataset(Integer, Integer, String, String, String, String, String, Map<String, String>);
+			chartsDataDWRService.getBankLoansPieChartImageInfo(Integer, Integer, String, String, String, String, String, Map<String, String>);
+			chartsDataDWRService.getBankLoansChartImageInfo(Integer, Integer, String, String, String, String, String, Map<String, String>);
+			chartsDataDWRService.getBankLoansChartDataset(Integer, Integer, String, String, String, String, String, String, Map<String, String>);
+		]]>
+	</signatures>
+</dwr>

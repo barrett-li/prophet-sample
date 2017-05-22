@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="prophet" basedir="." default="dist">
+
+	<property environment="env"/>
+
+	<property name="app.name" value="prophet"/>
+	<property name="app.sname" value="prophet"/>
+	<property name="app.version" value="1.2.01"/>
+
+	<!-- ==================== File and Directory Names ======================== -->
+	<property name="dist.home" value="${basedir}/dist"/>
+	<property name="build.home" value="${basedir}/build"/>
+	<property name="resources.home" value="${basedir}/resources"/>
+	<property name="report.home" value="${basedir}/report"/>
+	
+	<property name="src.home" value="${basedir}/src"/>
+	<property name="web.home" value="${basedir}/webapp"/>
+	<property name="lib.home" value="${basedir}/lib"/>
+	<property name="test.home" value="${basedir}/test"/>
+	<property name="doc.home" value="${basedir}/doc"/>
+
+	<!--  ==================== Compilation Control Options ==================== -->
+	<property name="compile.debug" value="off"/>
+	<property name="compile.deprecation" value="off"/>
+	<property name="compile.optimize" value="true"/>
+	<property name="compile.source" value="1.4"/>
+	<property name="compile.target" value="1.4"/>
+	<property name="compile.encoding" value="utf-8"/>
+
+	<!--  ==================== Create Java Doc Control Options ==================== -->
+	<property name="doc.encoding" value="utf-8"/>
+
+	<!-- ==================== Compilation Classpath =========================== -->
+	<path id="compile.classpath">
+		<fileset dir="${lib.home}/build" includes="*.jar"/>
+		<fileset dir="${lib.home}/runtime" includes="*.jar"/>
+	</path>
+
+	<!-- ==================== Clean Target ==================================== -->
+	<target name="clean" description="Delete old build and dist directories">
+		<delete dir="${build.home}"/>
+		<delete dir="${dist.home}"/>
+		<delete dir="${report.home}"/>
+		<delete dir="${resources.home}"/>
+	</target>
+
+	<!-- ==================== Compile Target ================================== -->
+	<target name="compile" description="Compile Java sources">
+		<javac srcdir="${src.home}/java" destdir="${build.home}/WEB-INF/classes" debug="${compile.debug}"
+               deprecation="${compile.deprecation}" optimize="${compile.optimize}" source="${compile.source}"
+               target="${compile.target}" encoding="${compile.encoding}">
+			<classpath refid="compile.classpath"/>
+		</javac>
+	</target>
+	
+	<!-- ==================== Test Target ================================== -->
+	<target name="test" description="Execute Unit Tests">
+        <javac srcdir="${test.home}/java" destdir="${build.home}/WEB-INF/classes" debug="${compile.debug}"
+               deprecation="${compile.deprecation}" optimize="${compile.optimize}" source="${compile.source}"
+               target="${compile.target}" encoding="${compile.encoding}">
+            <classpath refid="compile.classpath"/>
+        </javac>
+		
+		<junit printsummary="yes" fork="yes" haltonfailure="no">
+			<classpath>
+				<path location="${build.home}/WEB-INF/classes" />
+				<path refid="compile.classpath" />
+			</classpath>
+			<formatter type="xml" />
+			<batchtest todir="${report.home}/data">
+				<fileset dir="${build.home}/WEB-INF/classes">
+					<include name="**/*Test.class" />
+				</fileset>
+			</batchtest>
+		</junit>
+		<junitreport todir="${report.home}">
+			<fileset dir="${report.home}/data">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="frames" todir="${report.home}" />
+		</junitreport>
+	</target>
+
+	<!-- ==================== Create Java Doc Target ================================== -->
+	<target name="createdoc" description="Create Java Doc">
+		<delete dir="${doc.home}/javadoc" />
+		<javadoc destdir="${doc.home}/javadoc" encoding="${doc.encoding}" docencoding="${doc.encoding}">
+			<packageset dir="${src.home}/java">
+				<include name="**"/>
+			</packageset>
+		</javadoc>
+	</target>
+
+	<!-- ==================== Prepare Target ================================== -->
+	<target name="prepare">
+		<!-- Create build directories as needed -->
+		<mkdir dir="${dist.home}"/>
+		<mkdir dir="${build.home}"/>
+		<mkdir dir="${build.home}/WEB-INF"/>
+		<mkdir dir="${build.home}/WEB-INF/classes"/>
+		
+        <mkdir dir="${report.home}"/>
+        <mkdir dir="${report.home}/data"/>
+		
+		<mkdir dir="${resources.home}"/>
+		<mkdir dir="${resources.home}/dbscript"/>
+		<mkdir dir="${resources.home}/dist"/>
+		<mkdir dir="${resources.home}/doc"/>
+		<mkdir dir="${resources.home}/lib"/>
+		<mkdir dir="${resources.home}/src"/>
+		<mkdir dir="${resources.home}/test"/>
+		<mkdir dir="${resources.home}/webapp"/>
+		<!-- Copy static content of this web application -->
+		<copy todir="${build.home}">
+			<fileset dir="${web.home}" excludes="WEB-INF/classes/**"/>
+		</copy>
+		<copy todir="${build.home}/WEB-INF/classes">
+			<fileset dir="${src.home}/java" excludes="WEB-INF/classes/**.java"/>
+		</copy>
+		<copy todir="${build.home}/WEB-INF/classes">
+			<fileset dir="${src.home}/resources" excludes="spring/**, webwork/**, dwr/**"/>
+		</copy>
+		<copy todir="${build.home}/WEB-INF/classes">
+			<fileset dir="${src.home}/resources/spring"/>
+		</copy>
+		<copy todir="${build.home}/WEB-INF/classes">
+			<fileset dir="${src.home}/resources/webwork"/>
+		</copy>
+		<copy todir="${build.home}/WEB-INF/classes">
+			<fileset dir="${src.home}/resources/dwr"/>
+		</copy>
+		<copy todir="${build.home}/WEB-INF/lib">
+			<fileset dir="${lib.home}/runtime" includes="*.jar"/>
+		</copy>
+
+		<copy todir="${resources.home}">
+			<fileset file="${basedir}/build.xml" />
+		</copy>
+		<copy todir="${resources.home}/dbscript">
+			<fileset dir="${basedir}/dbscript" />
+		</copy>
+		<copy todir="${resources.home}/doc">
+			<fileset dir="${basedir}/doc" />
+		</copy>
+		<copy todir="${resources.home}/lib">
+			<fileset dir="${lib.home}"/>
+		</copy>
+		<copy todir="${resources.home}/src">
+			<fileset dir="${src.home}"/>
+		</copy>
+		<copy todir="${resources.home}/test">
+			<fileset dir="${test.home}" />
+		</copy>
+		<copy todir="${resources.home}/webapp">
+			<fileset dir="${web.home}" excludes="WEB-INF/classes/**, WEB-INF/lib/**"/>
+		</copy>
+	</target>
+
+	<!-- ==================== Dist Target ===================================== -->
+	<target name="dist" depends="clean, createdoc, prepare, compile" description="Create binary distribution">
+		<!-- Create application WAR file -->
+		<jar jarfile="${dist.home}/${app.sname}.war" basedir="${build.home}"/>
+		<copy todir="${resources.home}/dist">
+			<fileset dir="${dist.home}"/>
+		</copy>
+		<zip destfile="${dist.home}/${app.sname}-${app.version}-src.zip" basedir="${resources.home}"/>
+		<tar tarfile="${dist.home}/${app.sname}-${app.version}-src.tar" basedir="${resources.home}"/>
+		<gzip zipfile="${dist.home}/${app.sname}-${app.version}-src.tar.gz" src="${dist.home}/${app.sname}-${app.version}-src.tar"/>
+		<delete dir="${build.home}"/>
+		<delete dir="${resources.home}"/>
+	</target>
+
+</project>

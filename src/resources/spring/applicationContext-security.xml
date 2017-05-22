@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+	default-autowire="byName" default-lazy-init="true">
+
+	<bean id="authoritiesDAO" class="com.resoft.prophet.security.dao.AuthoritiesDAO">
+		<property name="sqlMapClient" ref="sqlMapClient" />
+	</bean>
+
+	<bean id="resourceDAO" class="com.resoft.prophet.security.dao.ResourceDAO">
+		<property name="sqlMapClient" ref="sqlMapClient" />
+	</bean>
+
+	<bean id="userDAO" class="com.resoft.prophet.security.dao.UserDAO">
+		<property name="sqlMapClient" ref="sqlMapClient" />
+	</bean>
+
+	<bean id="menuDAO" class="com.resoft.prophet.security.dao.MenuDAO">
+		<property name="sqlMapClient" ref="sqlMapClient" />
+	</bean>
+
+	<bean id="securityService" class="com.resoft.prophet.security.service.SecurityServiceImpl">
+		<property name="authoritiesDAO" ref="authoritiesDAO" />
+		<property name="resourceDAO" ref="resourceDAO" />
+		<property name="userDAO" ref="userDAO" />
+		<property name="menuDAO" ref="menuDAO" />
+	</bean>
+	
+	<bean id="securityDWRService" class="com.resoft.prophet.security.web.SecurityDWRService" scope="prototype">
+		<property name="securityService" ref="securityService" />
+	</bean>
+	
+	<bean id="setUserPasswordAction" class="com.resoft.prophet.security.web.SetUserPasswordAction" scope="prototype">
+		<property name="securityService" ref="securityService" />
+		<property name="saltSource" ref="saltSource" />
+		<property name="passwordEncoder" ref="passwordEncoder" />
+	</bean>
+	
+</beans>

@@ -1,0 +1,8 @@
+{
+    countrys: [
+        {countryCode: 'US', countryName: 'United States'},
+        {countryCode: 'DE', countryName: 'Germany'},
+        {countryCode: 'FR', countryName: 'France'}
+    ],
+    totalCount: 3
+}

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Department">
+
+    <typeAlias alias="department" type="com.resoft.prophet.org.domain.Department"/>
+	
+	<!-- Configuration department results cache, use OSCache -->
+	<cacheModel id="deptCache" type="OSCACHE">
+		<flushInterval hours="24"/>
+		<flushOnExecute statement="Department.insertDept"/>
+		<flushOnExecute statement="Department.deleteDept"/>
+		<flushOnExecute statement="Department.updateDept"/>
+		<property name="size" value="1000"/>
+	</cacheModel>
+	
+    <parameterMap id="insert-department-param" class="department">
+        <parameter property="fullName" />
+        <parameter property="shortName" />
+        <parameter property="remark" jdbcType="VARCHAR" nullValue="NO_ENTRY"/>
+        <parameter property="id" />
+    </parameterMap>
+
+    <resultMap id="get-department-result" class="department">
+        <result property="id" column="DEPT_ID" />
+        <result property="fullName" column="FULLNAME" />
+        <result property="shortName" column="SHORTNAME" />
+        <result property="remark" nullValue="REMARK" column="REMARK"/>
+    </resultMap>
+
+    <insert id="insertDept" parameterMap="insert-department-param">
+        insert into
+        PRO_DEPARTMENT (FULLNAME, SHORTNAME, REMARK, DEPT_ID)
+        values (?, ?, ?, ?)
+    </insert>
+
+    <delete id="deleteDept">
+        delete from
+        PRO_DEPARTMENT
+        where DEPT_ID = #id#
+    </delete>
+
+    <update id="updateDept" parameterMap="insert-department-param">
+        update PRO_DEPARTMENT
+        set FULLNAME = ?, SHORTNAME = ?, REMARK = ?
+        where DEPT_ID = ?
+    </update>
+
+    <select id="getDept" resultMap="get-department-result">
+        select *
+        from PRO_DEPARTMENT
+        where DEPT_ID = #id#
+    </select>
+    
+    <!-- Cache department results -->
+    <select id="getAllDepts" parameterClass="java.util.Map" resultMap="get-department-result" cacheModel="deptCache">
+    	select * from PRO_DEPARTMENT
+		<dynamic prepend="order by">
+			<isNotEmpty property="sort">
+				$sort$
+     		</isNotEmpty>
+     		<isNotEmpty property="direction">
+         		$direction$
+     		</isNotEmpty>
+		</dynamic> 
+    </select>
+	
+    <select id="getDepts" parameterClass="java.util.Map" resultMap="get-department-result">
+        select  DEPT_ID, FULLNAME, SHORTNAME, REMARK
+	        from PRO_DEPARTMENT dep
+	        <dynamic prepend="where">
+	            <isNotEmpty prepend="and" property="fullName">
+	                FULLNAME = #fullName#
+	            </isNotEmpty>
+	            <isNotEmpty prepend="and" property="shortName">
+	                SHORTNAME = #shortName#
+	            </isNotEmpty>
+	        </dynamic>
+        <dynamic prepend="order by">
+	        <isNotEmpty property="sort">
+				$sort$
+	        </isNotEmpty>
+	        <isEmpty property="sort">
+				DEPT_ID
+	        </isEmpty>
+	        <isNotEmpty property="direction">
+	            $direction$
+	        </isNotEmpty>
+	        <isEmpty property="direction">
+	            ASC
+	        </isEmpty>
+        </dynamic>
+        <dynamic prepend="limit">
+            <isNotEmpty property="firstResult">
+	            <isNotEmpty property="maxResults">
+	                #firstResult#, #maxResults#
+	            </isNotEmpty>
+            </isNotEmpty>
+        </dynamic>
+    </select>
+
+    <select id="countDepts" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select count(DEPT_ID) 
+        from PRO_DEPARTMENT 
+        <dynamic prepend="where">
+            <isNotEmpty prepend="and" property="fullName">
+                FULLNAME = #fullName#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="shortName">
+                SHORTNAME = #shortName#
+            </isNotEmpty>
+        </dynamic>
+    </select>
+
+    <select id="isDeptExisted" parameterClass="java.util.Map" resultMap="get-department-result">
+        select *
+        from PRO_DEPARTMENT
+        where FULLNAME = #fullName#
+        and DEPT_ID <![CDATA[<>]]> #id#
+    </select>
+
+</sqlMap>

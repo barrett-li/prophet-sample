@@ -1,0 +1,230 @@
+﻿<html>
+
+<head>
+<title>Animate Pie Chart</title>
+<style>*{font-family:Verdana;}</style>
+
+</head>
+
+<body>
+<CENTER><h1>Ideas about Office Web Component 10 (OWC10)</h1>
+<BLOCKQUOTE>Hedger Wang</BLOCKQUOTE></CENTER>
+<H3>Animate Pie Chart</H3>
+Well, javascript help me to update XMLData of OWC10 dynamically.<BR> 
+
+
+
+<noscript id="PieData">
+<xml xmlns:x='urn:schemas-microsoft-com:office:excel'>
+ <x:ChartSpace>
+  <x:OWCVersion>10.0.0.5608         </x:OWCVersion>
+  <x:Width>15240</x:Width>
+  <x:Height>10160</x:Height>
+  <x:DisplayPropertyBrowser/>
+  
+  <x:DefaultFont>Verdana</x:DefaultFont>
+  <x:Border>
+   <x:ColorIndex>None</x:ColorIndex>
+   <x:Weight>0</x:Weight>
+  </x:Border>
+  <x:Chart>
+   <x:PlotArea>
+    <x:Graph>
+     <x:Type>Pie</x:Type>
+     <x:SubType>Standard</x:SubType>
+     <x:SubType>3D</x:SubType>
+     <x:Series>
+     
+      <x:Name>Category 2</x:Name>
+      <x:Caption>
+       <x:DataSourceIndex>-1</x:DataSourceIndex>
+       <x:Data>&quot;Category a2&quot;</x:Data>
+      </x:Caption>
+      <x:Index>0</x:Index>
+      <x:Category>
+       <x:DataSourceIndex>-1</x:DataSourceIndex>
+       
+	   Category START======================
+	   <x:Data>{_HH_CategoryName_}</x:Data>
+       Category  END ======================
+	  
+	  </x:Category>
+      <x:Value>
+       <x:DataSourceIndex>-1</x:DataSourceIndex>
+       <x:Data>{_HH_CategoryValue_}</x:Data>
+      </x:Value>
+      
+	  Color START======================
+	  _HH_CategoryColor_
+      Color  END ======================
+	
+	  
+	  <x:Marker>
+       <x:Symbol>None</x:Symbol>
+      </x:Marker>
+      <x:Explode>0</x:Explode>
+      <x:Thickness>12</x:Thickness>
+     </x:Series>
+     <x:VaryColors/>
+     <x:Dimension>
+      <x:ScaleID>38293240</x:ScaleID>
+      <x:Index>Value</x:Index>
+     </x:Dimension>
+     <x:HoleSize>0</x:HoleSize>
+     <x:FirstSliceAngle>_HH_FirstSliceAngle_</x:FirstSliceAngle>
+    </x:Graph>
+   </x:PlotArea>
+   
+   <x:View3D>
+    <x:GapDepth>120</x:GapDepth>
+    <x:Perspective>10.0</x:Perspective>
+    <x:Rotation>20.0</x:Rotation>
+    <x:Inclination>50.0</x:Inclination>
+    <x:Light>
+     <x:Rotation>15.0</x:Rotation>
+     <x:Inclination>15.0</x:Inclination>
+     <x:IntensityDiffuse>0.549019607843137</x:IntensityDiffuse>
+     <x:IntensityAmbient>0.619607843137255</x:IntensityAmbient>
+     <x:Normal>2.5</x:Normal>
+    </x:Light>
+   </x:View3D>
+  
+  </x:Chart>
+ <x:Legend><x:Placement>Bottom</x:Placement></x:Legend>
+  <x:HasSelectionFeedback>False</x:HasSelectionFeedback>
+ </x:ChartSpace>
+</xml>
+
+</noscript>
+
+
+<object id="HH_Pie" classid="clsid:0002E556-0000-0000-C000-000000000046" width="50%" height="384" hidefocus>
+  <param name="XMLData" value="">
+  <param name="ScreenUpdating" value="-1">
+  <param name="EnableEvents" value="-1">
+</object>
+
+
+<!--  
+<SCRIPT LANGUAGE="JavaScript" for="HH_Pie" event="BeforeContextMenu(x, y, Menu, Cancel)">
+    var cmContextMenu = new Array();
+    var cmClearSubMenu  = new Array();
+
+   
+	cmClearSubMenu[0] =["&All", "ALL"]
+    cmClearSubMenu[1] =["&Formats", "ClearFormats"]
+    cmClearSubMenu[2] =["&Values", "ClearValues"]
+
+    cmContextMenu[0] =["Cu&t", ""]
+    cmContextMenu[1] =["&Copy", "owc3"]
+    cmContextMenu[2] =["&Paste", "owc4"]
+    cmContextMenu[3] = null
+    cmContextMenu[4] =["Clea&r", cmClearSubMenu]
+    Menu.Value = cmContextMenu
+    
+</SCRIPT>
+
+<SCRIPT LANGUAGE="JavaScript" for="HH_Pie" event="CommandExecute(Command, Succeeded)">
+   alert(Command)
+ </SCRIPT>
+
+<script language = 'javascript' for = 'HH_Pie' event = 'Click'>
+try{
+if(this.Selection.Index){
+alert(this.AllowPropertyToolBox)
+alert(this.SelectionData[this.Selection.Index]);
+event.returnValue=false;
+return false;
+}
+}
+catch(e){};
+
+
+
+//DisplayPropertyToolbox:true
+//HasChartSpaceLegend:false
+//HasSelectionMarks:1
+</script>
+-->
+
+
+<script language = 'javascript' >
+window.attachEvent("onload",LoadChartData)
+var R=0;
+function LoadChartData()
+{ 
+  var Pie = document.all.HH_Pie;
+      Pie.SelectionData = new Array();
+
+  var PieCategory = new Array(10);
+  var ColorPlate = ("#FFFF00,#FF9900,#FF0000,#FF00CC,#CC00FF,#CCFF66,#99FF33,#6699FF,#3399CC,#66FF33,#CC66FF").split(",");
+  PieSelectionData = new Array(); 
+  //Category Name ==================================
+ 
+  var CategoryName ="";
+	  for(var i=0;i<PieCategory.length;i++)
+	  {
+       CategoryName += "&quot;This isCategory" + i + "&quot;";
+	   if(i<( PieCategory.length-1)){CategoryName +=","}
+	   PieCategory[i] =new Object(); 
+	   PieCategory[i].Name="This isCategory" + i  ;
+	  
+	  }
+  //Category Value ==================================
+  var CategoryValue = "";
+	  for(var i=0;i< PieCategory.length;i++)
+	  {
+       //var V =  Math.floor(Math.random()*1000) ;
+	   var V = 1000 ;
+	   if(i==0)
+	   {
+         V = Math.ceil( Math.sin((R)/(Math.PI*10))*2000);
+	   }
+	   CategoryValue +=   V
+	   if(i<(PieCategory.length-1)){CategoryValue +=","}
+	   PieCategory[i].Value= V; 
+	  }
+  //Category Value ==================================
+   var CategoryColor = "";
+	  for(var i=0;i< PieCategory.length;i++)
+	  {
+       CategoryColor += "<x:DataPoint><x:Index>"+i+"</x:Index><x:Interior><x:Color>"+ColorPlate[i]+"</x:Color></x:Interior></x:DataPoint>";
+	   PieCategory[i].Color= ColorPlate[i]
+	  }
+  
+
+	 
+  R++;
+  if(R>360){R=0};
+ 
+  
+  var XmlData = document.all.PieData.innerHTML;
+  XmlData =  ReplaceTxt(XmlData,"_HH_CategoryName_", CategoryName);
+  XmlData =  ReplaceTxt(XmlData,"_HH_CategoryValue_", CategoryValue);
+  XmlData =  ReplaceTxt(XmlData,"_HH_CategoryColor_", CategoryColor);
+  XmlData =  ReplaceTxt(XmlData,"_HH_FirstSliceAngle_", R);
+ 
+  Pie.blur();
+  status = CategoryValue;
+  Pie.XmlData = XmlData;
+
+  setTimeout("LoadChartData()",100);
+}
+
+
+
+
+
+
+function ReplaceTxt(srcText, Old, New){
+   var r, re;                  
+   re =eval("/" + Old + "/g");
+   status =re;
+   r = srcText.replace(re, New);   
+   return(r);                   
+}
+
+</script>
+</body>
+
+</html>

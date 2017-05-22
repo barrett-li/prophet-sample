@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Security">
+
+    <typeAlias alias="user" type="com.resoft.prophet.security.domain.User" />
+    <typeAlias alias="authority" type="com.resoft.prophet.security.domain.Authorities" />
+    <typeAlias alias="resource" type="com.resoft.prophet.security.domain.Resource" />
+    <typeAlias alias="menu" type="com.resoft.prophet.security.domain.Menu" />
+    
+    <parameterMap id="insert-user-param" class="user">
+        <parameter property="username" />
+        <parameter property="password" />
+        <parameter property="enabled" />
+        <parameter property="id" />
+    </parameterMap>
+    
+    <resultMap id="get-user-result" class="user">
+    	<result property="id" column="USER_ID" nullValue="" />
+        <result property="username" column="USERNAME" nullValue="" />
+        <result property="password" column="PASSWORD" nullValue="" />
+        <result property="enabled" column="ENABLED" nullValue="true" />
+    </resultMap>
+	
+    <resultMap id="get-resource-result" class="resource">
+        <result property="id" column="RES_ID" nullValue="" />
+        <result property="resType" column="RES_TYPE" nullValue="" />
+        <result property="resString" column="RES_STRING" nullValue="" />
+        <result property="display" column="DISPLAY" nullValue="" />
+    </resultMap>
+
+    <resultMap id="get-authority-result" class="authority">
+    	<result property="id" column="AUTH_ID" nullValue="" />
+    	<result property="authority" column="AUTHORITY" nullValue="" />
+    	<result property="display" column="DISPLAY" nullValue="" />
+        <result property="note" column="NOTE" nullValue="" />
+    </resultMap>
+
+    <resultMap id="get-menu-result" class="menu">
+    	<result property="id" column="MENU_ID" nullValue="" />
+    	<result property="name" column="NAME" nullValue="" />
+    	<result property="note" column="NOTE" nullValue="" />
+        <result property="href" column="HREF" nullValue="" />
+        <result property="sort" column="SORT" nullValue="" />
+        <result property="leaf" column="LEAF" nullValue="true" />
+    </resultMap>
+
+    <update id="updateUser" parameterMap="insert-user-param">
+        update PRO_USER
+        set USERNAME = ?, PASSWORD = ?, ENABLED = ?
+        where USER_ID = ?
+    </update>
+
+    <select id="getUserById" resultMap="get-user-result">
+		select * from PRO_USER where USER_ID = #id#
+    </select>
+
+    <select id="getUserByUsername" resultMap="get-user-result">
+		select * from PRO_USER where USERNAME = #username#
+    </select>
+    
+    <select id="getAuthoritiesByUsername" parameterClass="java.util.Map" resultMap="get-authority-result">
+		select a.* from PRO_USER as u, PRO_AUTHORITIES as a, PRO_USER_AUTH as ua 
+		where u.USER_ID = ua.USER_ID 
+		and a.AUTH_ID = ua.AUTH_ID 
+		and u.USERNAME = #username#
+        <isNotEmpty prepend="and" property="rolePrefix">
+            a.AUTHORITY like '$rolePrefix$%'
+        </isNotEmpty>
+    </select>
+    
+    <select id="getAuthoritiesByResString" parameterClass="java.util.Map" resultMap="get-authority-result">
+		select a.* from PRO_RESOURCE as r, PRO_AUTHORITIES as a, PRO_RES_AUTH as ra 
+		where r.RES_ID = ra.RES_ID 
+		and a.AUTH_ID = ra.AUTH_ID 
+		and r.RES_STRING = #resString#
+        <isNotEmpty prepend="and" property="rolePrefix">
+            a.AUTHORITY like '$rolePrefix$%'
+        </isNotEmpty>
+    </select>
+    
+    <select id="getResourceByTypes" resultMap="get-resource-result">
+		select * from PRO_RESOURCE where RES_TYPE in ($types$)
+    </select>
+    
+    <select id="getMenusByParentId" parameterClass="java.util.Map" resultMap="get-menu-result">
+		select distinct m.*  from 
+		PRO_MENU as m 
+		left join PRO_RESOURCE as r on r.RES_STRING = m.MENU_ID 
+		left join PRO_RES_AUTH as ra on r.RES_ID = ra.RES_ID 
+		left join PRO_USER_AUTH as ua on ua.AUTH_ID = ra.AUTH_ID 
+		where m.PARENT_ID = #parentId# 
+		and ua.USER_ID = #userId# 
+		order by m.SORT
+    </select>
+    
+</sqlMap>

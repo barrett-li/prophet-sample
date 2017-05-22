@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+<web-app>
+
+	<display-name>prophet</display-name>
+
+	<description>Prophet Application</description>
+
+	<!--
+		- Key of the system property that should specify the root directory of this
+		- web app. Applied by WebAppRootListener or Log4jConfigListener.
+	-->
+	<context-param>
+		<param-name>webAppRootKey</param-name>
+		<param-value>prophet.root</param-value>
+	</context-param>
+
+	<!--
+		- Location of the Log4J config file, for initialization and refresh checks.
+		- Applied by Log4jConfigListener.
+	-->
+	<context-param>
+		<param-name>log4jConfigLocation</param-name>
+		<param-value>classpath:log4j.properties</param-value>
+	</context-param>
+
+	<!--
+		- Location of the XML file that defines the root application context.
+		- Applied by ContextLoaderServlet.
+	-->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:applicationContext*.xml</param-value>
+	</context-param>
+
+	<!-- Acegi Filter Chain Proxy -->
+	<filter>
+		<filter-name>securityFilter</filter-name>
+		<filter-class>org.acegisecurity.util.FilterToBeanProxy</filter-class>
+		<init-param>
+			<param-name>targetClass</param-name>
+			<param-value>org.acegisecurity.util.FilterChainProxy</param-value>
+		</init-param>
+	</filter>
+
+	<!-- Character Encoding Filter -->
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+
+	<!-- WebWork2 Filter Dispatcher -->
+	<filter>
+		<filter-name>webworkFilter</filter-name>
+		<filter-class>com.opensymphony.webwork.dispatcher.FilterDispatcher</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>securityFilter</filter-name>
+		<url-pattern>*.html</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>securityFilter</filter-name>
+		<url-pattern>*.jsp</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>securityFilter</filter-name>
+		<url-pattern>*.action</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>securityFilter</filter-name>
+		<url-pattern>/dwr/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>securityFilter</filter-name>
+		<url-pattern>/j_acegi_security_check</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>securityFilter</filter-name>
+		<url-pattern>/j_acegi_logout</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>webworkFilter</filter-name>
+		<url-pattern>*.action</url-pattern>
+	</filter-mapping>
+
+	<!--
+		- Configures Log4J for this web app.
+		- As this context specifies a context-param "log4jConfigLocation", its file path
+		- is used to load the Log4J configuration, including periodic refresh checks.
+		-
+		- Would fall back to default Log4J initialization (non-refreshing) if no special
+		- context-params are given.
+		-
+		- Exports a "web app root key", i.e. a system property that specifies the root
+		- directory of this web app, for usage in log file paths.
+		- This web app specifies "petclinic.root" (see log4j.properties file).
+	-->
+	<listener>
+		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+	</listener>
+
+	<!--
+		- Loads the root application context of this web app at startup,
+		- by default from "/WEB-INF/applicationContext.xml".
+		- Note that you need to fall back to Spring's ContextLoaderServlet for
+		- J2EE servers that do not follow the Servlet 2.4 initialization order.
+		-
+		- Use WebApplicationContextUtils.getWebApplicationContext(servletContext)
+		- to access it anywhere in the web application, outside of the framework.
+		-
+		- The root context is the parent of all servlet-specific contexts.
+		- This means that its beans are automatically available in these child contexts,
+		- both for getBean(name) calls and (external) bean references.
+	-->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<!-- DWR -->
+	<servlet>
+		<servlet-name>dwr-invoker</servlet-name>
+		<display-name>DWR Servlet</display-name>
+		<description>Direct Web Remoter Servlet</description>
+		<servlet-class>org.directwebremoting.servlet.DwrServlet</servlet-class>
+		<init-param>
+			<param-name>config-dwr</param-name>
+			<param-value>/WEB-INF/classes/dwr.xml</param-value>
+		</init-param>
+		<init-param>
+			<param-name>debug</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>pollAndCometEnabled</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>allowGetForSafariButMakeForgeryEasier</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<!-- Security DWR -->
+	<servlet>
+		<servlet-name>dwr-security-invoker</servlet-name>
+		<display-name>Security DWR Servlet</display-name>
+		<description>Security Direct Web Remoter Servlet</description>
+		<servlet-class>org.directwebremoting.servlet.DwrServlet</servlet-class>
+		<init-param>
+			<param-name>config-dwr</param-name>
+			<param-value>/WEB-INF/classes/dwr-security.xml</param-value>
+		</init-param>
+		<init-param>
+			<param-name>debug</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>pollAndCometEnabled</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>allowGetForSafariButMakeForgeryEasier</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<!-- ORG DWR -->
+	<servlet>
+		<servlet-name>dwr-org-invoker</servlet-name>
+		<display-name>ORG DWR Servlet</display-name>
+		<description>ORG Direct Web Remoter Servlet</description>
+		<servlet-class>org.directwebremoting.servlet.DwrServlet</servlet-class>
+		<init-param>
+			<param-name>config-dwr</param-name>
+			<param-value>/WEB-INF/classes/dwr-org.xml</param-value>
+		</init-param>
+		<init-param>
+			<param-name>debug</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>pollAndCometEnabled</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>allowGetForSafariButMakeForgeryEasier</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<!-- Charts Sample Data DWR -->
+	<servlet>
+		<servlet-name>dwr-charts-invoker</servlet-name>
+		<display-name>Charts Sample Data DWR Servlet</display-name>
+		<description>Charts Sample Data Direct Web Remoter Servlet</description>
+		<servlet-class>org.directwebremoting.servlet.DwrServlet</servlet-class>
+		<init-param>
+			<param-name>config-dwr</param-name>
+			<param-value>/WEB-INF/classes/dwr-charts.xml</param-value>
+		</init-param>
+		<init-param>
+			<param-name>debug</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>pollAndCometEnabled</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>allowGetForSafariButMakeForgeryEasier</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<!-- JFreeChart -->
+	<servlet>
+		<servlet-name>displayChart</servlet-name>
+		<servlet-class>org.jfree.chart.servlet.DisplayChart</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>dwr-invoker</servlet-name>
+		<url-pattern>/dwr/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>dwr-security-invoker</servlet-name>
+		<url-pattern>/dwr/security/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>dwr-org-invoker</servlet-name>
+		<url-pattern>/dwr/org/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>dwr-charts-invoker</servlet-name>
+		<url-pattern>/dwr/charts/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>displayChart</servlet-name>
+		<url-pattern>/jfreechart/DisplayChart</url-pattern>
+	</servlet-mapping>
+
+	<!-- Welcome Files -->
+	<welcome-file-list>
+		<welcome-file>/pages/index.jsp</welcome-file>
+	</welcome-file-list>
+
+	<!-- JSTL Tag -->
+	<taglib>
+		<taglib-uri>http://java.sun.com/jstl/core</taglib-uri>
+		<taglib-location>/WEB-INF/tlds/jstl/c-1_0.tld</taglib-location>
+	</taglib>
+	<taglib>
+		<taglib-uri>http://java.sun.com/jstl/fmt</taglib-uri>
+		<taglib-location>/WEB-INF/tlds/jstl/fmt-1_0.tld</taglib-location>
+	</taglib>
+	<taglib>
+		<taglib-uri>http://java.sun.com/jstl/xml</taglib-uri>
+		<taglib-location>/WEB-INF/tlds/jstl/x-1_0.tld</taglib-location>
+	</taglib>
+	 
+	<!-- WebWork Tag -->
+	<taglib>
+		<taglib-uri>webwork</taglib-uri>
+		<taglib-location>/WEB-INF/tlds/webwork/taglib.tld</taglib-location>
+	</taglib>
+
+	<!-- OSCache Tag -->
+	<taglib>
+		<taglib-uri>oscache</taglib-uri>
+		<taglib-location>/WEB-INF/tlds/oscache.tld</taglib-location>
+	</taglib>
+	
+	
+</web-app>

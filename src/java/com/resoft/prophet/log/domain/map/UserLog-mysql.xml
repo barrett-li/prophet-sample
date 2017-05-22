@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="UserLog">
+
+    <typeAlias alias="userLog" type="com.resoft.prophet.log.domain.UserLog"/>
+
+    <parameterMap id="insert-userlog-param" class="userLog">
+        <parameter property="type"/>
+        <parameter property="content"/>
+        <parameter property="userId"/>
+        <parameter property="userName"/>
+        <parameter property="createTime"/>
+        <parameter property="id"/>
+    </parameterMap>
+
+    <resultMap id="get-userlog-result" class="userLog">
+        <result property="id" column="USER_LOG_ID" />
+        <result property="type" column="USER_LOG_TYPE" />
+        <result property="content" column="CONTENT" />
+        <result property="userId" column="USERID" />
+        <result property="userName" column="USERNAME" />
+        <result property="createTime" column="CREATETIME" />
+    </resultMap>
+
+    <insert id="insertUserLog" parameterMap="insert-userlog-param">
+        insert into
+        PRO_USER_LOG (USER_LOG_TYPE, CONTENT, USERID, USERNAME, CREATETIME, USER_LOG_ID)
+        values (?, ?, ?, ?, ?, ?) 
+    </insert>
+
+    <select id="getUserLogs" parameterClass="java.util.Map" resultMap="get-userlog-result">
+        select *
+        from PRO_USER_LOG
+        <dynamic prepend="WHERE">
+            <isNotEmpty prepend="AND" property="type">
+                USER_LOG_TYPE = #type#
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="userName">
+                USERNAME = #userName#
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="beginTime">
+                CREATETIME <![CDATA[>=]]> #beginTime#
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="endTime">
+                CREATETIME <![CDATA[<=]]> #endTime#
+            </isNotEmpty>
+        </dynamic>
+        order by  CREATETIME desc
+    </select>
+
+</sqlMap>

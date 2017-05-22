@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Charts">
+
+    <typeAlias alias="bankloan" type="com.resoft.prophet.charts.sample.domain.BankLoan"/>
+
+    <resultMap id="get-bankloan-result" class="bankloan">
+        <result property="area" column="AREA"/>
+        <result property="org" column="ORG"/>
+        <result property="deadLoans" column="DEAD_LOANS"/>
+        <result property="overdueLoans" column="OVERDUE_LOANS"/>
+        <result property="violationLoans" column="VIOLATION_LOANS"/>
+    </resultMap>
+
+    <select id="getBankLoans" parameterClass="java.util.Map" resultMap="get-bankloan-result">
+	      select  b.*
+	        from PRO_BANK_LOAN b
+	        <dynamic prepend="where">
+	            <isNotEmpty prepend="and" property="area">
+	                b.AREA = #area#
+	            </isNotEmpty>
+	            <isNotEmpty prepend="and" property="org">
+	                b.ORG = #org#
+	            </isNotEmpty>
+	        </dynamic>
+         <dynamic prepend="order by">
+	        <isNotEmpty property="sort">
+				$sort$
+	        </isNotEmpty>
+	        <isEmpty property="sort">
+				ORG
+	        </isEmpty>
+	        <isNotEmpty property="direction">
+	            $direction$
+	        </isNotEmpty>
+	        <isEmpty property="direction">
+	            ASC
+	        </isEmpty>
+        </dynamic>
+        <dynamic prepend="limit">
+            <isNotEmpty property="firstResult">
+	            <isNotEmpty property="maxResults">
+	                #firstResult#, #maxResults#
+	            </isNotEmpty>
+            </isNotEmpty>
+        </dynamic>
+    </select>
+
+    <select id="countBankLoans" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select count(*) 
+        from PRO_BANK_LOAN b
+        <dynamic prepend="where">
+            <isNotEmpty prepend="and" property="area">
+                b.AREA = #area#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="org">
+                b.ORG = #org#
+            </isNotEmpty>
+        </dynamic>
+    </select>
+
+</sqlMap>

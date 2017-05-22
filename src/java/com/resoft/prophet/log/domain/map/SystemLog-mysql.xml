@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="SystemLog">
+
+    <typeAlias alias="systemLog" type="com.resoft.prophet.log.domain.SystemLog"/>
+
+    <parameterMap id="insert-systemLog-param" class="systemLog">
+        <parameter property="type"/>
+        <parameter property="content"/>
+        <parameter property="result"/>
+        <parameter property="createTime"/>
+        <parameter property="id"/>
+    </parameterMap>
+
+    <resultMap id="get-systemLog-result" class="systemLog">
+        <result property="id"/>
+        <result property="type"/>
+        <result property="content"/>
+        <result property="result"/>
+        <result property="createTime"/>
+    </resultMap>
+
+    <insert id="insertSystemLog" parameterMap="insert-systemLog-param">
+        insert into
+        PRO_SYSTEM_LOG (SYS_LOG_TYPE, CONTENT, SYS_LOG_RESULT, CREATETIME, SYS_LOG_ID)
+        values (?, ?, ?, ?, ?)
+    </insert>
+
+    <select id="getSystemLog" parameterClass="java.util.Map" resultMap="get-systemLog-result">
+        select *
+        from PRO_SYSTEM_LOG
+        <dynamic prepend="WHERE">
+            <isNotEmpty prepend="AND" property="type">
+                SYS_LOG_TYPE = #type#
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="result">
+                SYS_LOG_RESULT = #result#
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="beginTime">
+                CREATETIME <![CDATA[>=]]> #beginTime#
+            </isNotEmpty>
+            <isNotEmpty prepend="AND" property="endTime">
+                CREATETIME <![CDATA[<=]]> #endTime#
+            </isNotEmpty>
+        </dynamic>
+        order by CREATETIME desc
+    </select>
+
+</sqlMap>

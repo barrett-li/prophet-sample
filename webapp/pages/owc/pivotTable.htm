@@ -1,0 +1,221 @@
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<script language="javascript" type="text/javascript">
+	    var SEP = "/,/";
+		var strRowFieldNames = "机构/,/日期"; //行维度
+	    var strColumnFieldNames = "地区"; //列维度
+		var strFilterFieldNames = "节点"; //过虑
+		var intChartType = 46; //图表类型
+	    var pvt;
+	    var cht;
+		
+	    function reader() {
+	        var str = document.getElementById("data").value;
+	        var adors = new ActiveXObject("ADODB.Recordset"); //声明RecordSet对象
+	        var xmldoc = new ActiveXObject("msxml2.domdocument");
+			xmldoc.loadXML(str); //XMLDocument对象加载XML字符串
+	        adors.Open(xmldoc); //RecordSet设定数据源为上面的XMLDocument对象,并打开
+	        
+	        pvt = document.getElementById("pvtTable");
+	        pvt.DataSource = adors; //设定透视表的数据源为上面的RecordSet对象
+
+	        pvt.AutoFit = true; //自动设置Width 和 Height 值
+	        pvt.DisplayToolbar = true;
+	        pvt.DisplayExpandIndicator = true;
+	        pvt.DisplayAlerts = true;
+	        pvt.DisplayBranding = true;
+	        pvt.DisplayDesignTimeUI = true;
+	        pvt.DisplayFieldList = false;
+	        pvt.DisplayOfficeLogo = true;
+	        pvt.DisplayPropertyToolbox = false;
+	        pvt.DisplayScreenTips = true;
+	        //pvt.BackColor = "Sienna";
+			pvt.ActiveView.TitleBar.Caption = "标题"; //标题
+	        pvt.ActiveView.TitleBar.Visible = true; //是否显示
+			pvt.ActiveView.TitleBar.BackColor = "red"; //背景颜色
+			pvt.ActiveView.TitleBar.ForeColor = "green"; //前景颜色
+	        pvt.ActiveView.TitleBar.Font.Name = "arial";
+	        pvt.ActiveView.TitleBar.Font.Size = 10;
+			pvt.ActiveView.AllowAdditions = true;
+	
+	        //pvt.ActiveView.TotalBackColor = "CornSilk"; //汇总栏
+	        pvt.ActiveView.TotalFont.Name = "arial";
+	        pvt.ActiveView.TotalFont.Size = 8;
+	
+	        pvt.ActiveView.FieldLabelFont.Name = "arial"; //过虑栏
+	        pvt.ActiveView.FieldLabelFont.Size = 8;
+	
+	        pvt.ActiveView.HeaderFont.Name = "arial"; //指标栏
+	        pvt.ActiveView.HeaderFont.Size = 8;
+	
+	        pvt.ActiveView.PropertyCaptionFont.Name = "arial";
+	        pvt.ActiveView.PropertyCaptionFont.Size = 8;
+	
+	        pvt.ActiveView.PropertyValueFont.Name = "arial";
+	        pvt.ActiveView.PropertyValueFont.Size = 8;
+
+			//设定每一个字段的字体,字号,颜色等
+	        for(var i = 0; i < pvt.ActiveView.FieldSets.Count; i++) {
+	            pvt.ActiveView.FieldSets(i).Fields(0).DetailFont.Name = "arial";
+	            pvt.ActiveView.FieldSets(i).Fields(0).DetailFont.Size = 8;
+	            pvt.ActiveView.FieldSets(i).Fields(0).GroupedFont.Name = "arial";
+	            pvt.ActiveView.FieldSets(i).Fields(0).GroupedFont.Size = 8;
+	            pvt.ActiveView.FieldSets(i).Fields(0).SubtotalLabelFont.Name = "arial";
+	            pvt.ActiveView.FieldSets(i).Fields(0).SubtotalLabelFont.Size = 8;
+	            pvt.ActiveView.FieldSets(i).Fields(0).SubtotalFont.Name = "arial";
+	            pvt.ActiveView.FieldSets(i).Fields(0).SubtotalFont.Size = 8;
+	            pvt.ActiveView.FieldSets(i).Fields(0).SubtotalBackColor = "LightSteelBlue";
+			}
+			
+	        //将所有字段都添加到"过滤"区域
+	        for(var i = 0; i < pvt.ActiveView.FieldSets.Count - 2; i++) {
+	            pvt.ActiveView.FilterAxis.InsertFieldSet(pvt.ActiveView.FieldSets(i));
+	        }
+
+	        setRowFields(); //设定行区域
+	        setColumnFields(); //设定列区域
+	        setDataFields(); //设定明细区域
+	        setTotals(); //设定汇总
+
+            //设定图表对象
+            cht = document.getElementById("chtSpace");
+            
+            //设定图表数据源
+            cht.DataSource = pvt;
+            //设置图表的一些属性
+            cht.DisplayFieldButtons = false;
+            cht.object.Border.Color = -2;
+            cht.DisplayToolbar = true;
+			cht.DisplayFieldButtons = false;
+			cht.DisplayFieldList = false;
+			cht.DisplayOfficeLogo = false;
+			cht.HasChartSpaceLegend = true;
+			cht.HasPassiveAlerts = false;
+            //设定图表类型
+			//0表示平面, 45表示环形, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 63表示柱状3D 范围:0~63
+            cht.Charts(0).Type = 46;
+	    }
+	    
+		//设定行区域
+		function setRowFields() {
+		    if(strRowFieldNames == "") {
+		        return;
+		    }
+		    
+		    var rowFieldNames = strRowFieldNames.split(SEP);
+		    
+		    //循环要显示在行上的字段
+		    for(var i = 0; i < rowFieldNames.length; i++) {
+		        var objRow = pvt.ActiveView.FieldSets(rowFieldNames[i]).Fields(0);
+		        objRow.IsIncluded = true;
+		        pvt.ActiveView.RowAxis.InsertFieldSet(pvt.ActiveView.FieldSets(rowFieldNames[i]));  //添加
+		    }
+		}
+        
+       	//设定列区域
+	    function setColumnFields() {
+	        if(strColumnFieldNames == "") {
+	           return;
+	        }
+	        var columnFieldNames = strColumnFieldNames.split(SEP);
+	        
+			for(var i = 0; i < columnFieldNames.length; i++) {
+				var objColumn = pvt.ActiveView.FieldSets(columnFieldNames[i]).Fields(0);
+				objColumn.IsIncluded = true;
+				pvt.ActiveView.ColumnAxis.InsertFieldSet(pvt.ActiveView.FieldSets(columnFieldNames[i]));
+			}
+	    }
+
+       	//设定数据明细区域
+		function setDataFields() {
+			var columnFieldNames = strColumnFieldNames + SEP + strRowFieldNames + SEP + strFilterFieldNames + SEP;
+			for(var i = 0; i < pvt.ActiveView.FieldSets.Count; i++) {
+				if(columnFieldNames.indexOf(pvt.ActiveView.FieldSets(i).Name + SEP) == -1) {
+					pvt.ActiveView.DataAxis.InsertFieldSet(pvt.ActiveView.FieldSets(i));
+				}
+			}
+		}
+		
+		// 设定汇总
+		function setTotals() {
+	        if(pvt.ActiveView.Totals.Count == 0) {
+		        var ctotal = pvt.ActiveView.AddTotal("汇总本期1", pvt.ActiveView.FieldSets("本期值1").Fields(0), pvt.Constants.plFunctionSum);
+		        var ctotal2 = pvt.ActiveView.AddTotal("汇总本期2", pvt.ActiveView.FieldSets("本期值2").Fields(0), pvt.Constants.plFunctionSum);
+				//格式化数据
+		        ctotal.NumberFormat = "Currency";
+		        //在 PivotTotals 集合中添加PivotTotal对象
+		        pvt.ActiveView.DataAxis.InsertTotal(ctotal, 0);
+		        pvt.ActiveView.DataAxis.InsertFieldSet(pvt.ActiveView.FieldSets("本期值1"));  //在指定坐标轴插入一个字段集
+				ctotal2.NumberFormat = "Currency";
+		        pvt.ActiveView.DataAxis.InsertTotal(ctotal2, 1);
+		        pvt.ActiveView.DataAxis.InsertFieldSet(pvt.ActiveView.FieldSets("本期值2"));
+	        }
+		}
+		</script>
+	</head>
+	<body>
+		<p>
+			<object id="pvtTable" height="217" width="560"
+				classid="clsid:0002e55a-0000-0000-c000-000000000046" viewastext>
+			</object>
+		</p>
+		<p>
+			<object id="chtSpace" height="217" width="560"
+				classid="clsid:0002e55d-0000-0000-c000-000000000046" viewastext>
+			</object>
+		</p>
+		<p>
+			<textarea id="data" rows="30" style="width: 100%;">
+				<xml xmlns:s='uuid:BDC6E3F0-6DA3-11d1-A2A3-00AA00C14882'
+					xmlns:dt='uuid:C2F41010-65B3-11d1-A29F-00AA00C14882'
+					xmlns:rs='urn:schemas-microsoft-com:rowset' xmlns:z='#RowsetSchema'>
+					<s:Schema id='RowsetSchema'>
+						<s:ElementType name='row' content='eltOnly' rs:CommandTimeout='30'>
+							<s:AttributeType name='机构' rs:number='2' rs:nullable='true'>
+								<s:datatype dt:type='string' rs:dbtype='str' dt:maxLength='100' />
+							</s:AttributeType>
+							<s:AttributeType name='地区' rs:number='1' rs:nullable='true'>
+								<s:datatype dt:type='string' rs:dbtype='str' dt:maxLength='100' />
+							</s:AttributeType>
+							<s:AttributeType name='日期' rs:number='3' rs:nullable='true'>
+								<s:datatype dt:type='string' rs:dbtype='str' dt:maxLength='20' />
+							</s:AttributeType>
+							<s:AttributeType name='节点' rs:number='4' rs:nullable='true'>
+								<s:datatype dt:type='string' dt:maxLength='100' />
+							</s:AttributeType>
+							<s:AttributeType name='本期值1' rs:number='5' rs:nullable='true' rs:writeunknown='true'>
+								<s:datatype dt:type='float' dt:maxLength='8' rs:precision='15' rs:fixedlength='true' />
+							</s:AttributeType>
+							<s:AttributeType name='本期值2' rs:number='6' rs:nullable='true' rs:writeunknown='true'>
+								<s:datatype dt:type='float' dt:maxLength='8' rs:precision='15' rs:fixedlength='true' />
+							</s:AttributeType>
+							<s:extends type='rs:rowbase' />
+						</s:ElementType>
+					</s:Schema>
+					<rs:data>
+						<z:row 机构='兰州商行1' 地区='总行1' 日期='2006-06-30' 节点='可疑贷款1' 本期值1='0' 本期值2='21' />
+						<z:row 机构='兰州商行1' 地区='总行1' 日期='2006-06-30' 节点='可疑贷款2' 本期值1='2' 本期值2='22' />
+						<z:row 机构='兰州商行1' 地区='总行1' 日期='2007-06-30' 节点='可疑贷款1' 本期值1='3' 本期值2='23' />
+						<z:row 机构='兰州商行1' 地区='总行1' 日期='2007-06-30' 节点='可疑贷款2' 本期值1='4' 本期值2='24' />
+						<z:row 机构='兰州商行1' 地区='总行2' 日期='2006-06-30' 节点='可疑贷款1' 本期值1='5' 本期值2='25' />
+						<z:row 机构='兰州商行1' 地区='总行2' 日期='2006-06-30' 节点='可疑贷款2' 本期值1='6' 本期值2='26' />
+						<z:row 机构='兰州商行1' 地区='总行2' 日期='2007-06-30' 节点='可疑贷款1' 本期值1='7' 本期值2='27' />
+						<z:row 机构='兰州商行1' 地区='总行2' 日期='2007-06-30' 节点='可疑贷款2' 本期值1='8' 本期值2='28' />
+						<z:row 机构='兰州商行2' 地区='总行1' 日期='2006-06-30' 节点='可疑贷款1' 本期值1='9' 本期值2='29' />
+						<z:row 机构='兰州商行2' 地区='总行1' 日期='2006-06-30' 节点='可疑贷款2' 本期值1='10' 本期值2='210' />
+						<z:row 机构='兰州商行2' 地区='总行1' 日期='2007-06-30' 节点='可疑贷款1' 本期值1='11' 本期值2='211' />
+						<z:row 机构='兰州商行2' 地区='总行1' 日期='2007-06-30' 节点='可疑贷款2' 本期值1='12' 本期值2='212' />
+						<z:row 机构='兰州商行2' 地区='总行2' 日期='2006-06-30' 节点='可疑贷款1' 本期值1='13' 本期值2='213' />
+						<z:row 机构='兰州商行2' 地区='总行2' 日期='2006-06-30' 节点='可疑贷款2' 本期值1='14' 本期值2='214' />
+						<z:row 机构='兰州商行2' 地区='总行2' 日期='2007-06-30' 节点='可疑贷款1' 本期值1='15' 本期值2='215' />
+						<z:row 机构='兰州商行2' 地区='总行2' 日期='2007-06-30' 节点='可疑贷款2' 本期值1='16' 本期值2='216' />  
+					</rs:data>
+				</xml>
+			</textarea>
+		</p>
+		<script language="javascript" type="text/javascript">
+			reader();
+		</script>
+	</body>
+</html>

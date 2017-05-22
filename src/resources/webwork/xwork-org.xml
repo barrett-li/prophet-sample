@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE xwork PUBLIC "-//OpenSymphony Group//XWork 1.1.1//EN" "http://www.opensymphony.com/xwork/xwork-1.1.1.dtd">
+<xwork>
+	<package name="org" extends="default" namespace="/org">
+
+		<action name="insertDept" class="insertDeptAction">
+			<result name="success">/pages/org/addDept.jsp</result>
+		</action>
+		
+		<action name="getDepts" class="getDeptsAction">
+			<result name="success">/pages/org/depts.jsp</result>
+		</action>
+		
+		<action name="deleteDept" class="deleteDeptAction">
+			<result name="success">/pages/org/depts.jsp</result>
+		</action>
+		
+		<action name="updateDept" class="updateDeptAction">
+			<result name="success">/pages/org/editDept.jsp</result>
+		</action>
+		
+		<action name="getDept" class="getDeptAction">
+			<result name="success">/pages/org/editDept.jsp</result>
+		</action>  
+		
+		<action name="exportExcelDepts" class="exprotExcelDeptsAction">
+			<result name="success" type="stream"/>
+		</action>
+
+	</package>
+</xwork>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="Employee">
+
+    <typeAlias alias="employee" type="com.resoft.prophet.org.domain.Employee"/>
+
+    <parameterMap id="insert-employee-param" class="employee">
+        <parameter property="name"/>
+        <parameter property="department.id"/>
+        <parameter property="email" jdbcType="VARCHAR" nullValue=""/>
+        <parameter property="mobile" jdbcType="VARCHAR" nullValue=""/>
+        <parameter property="id"/>
+    </parameterMap>
+
+    <resultMap id="get-employee-result" class="employee">
+        <result property="id" column="EMPLOYEE_ID"/>
+        <result property="name" column="EMPLOYEE_NAME"/>
+        <result property="department.id" column="DEPT_ID"/>
+        <result property="department.fullName" column="FULLNAME"/>
+        <result property="department.shortName" column="SHORTNAME"/>
+        <result property="email" column="email" nullValue=""/>
+        <result property="mobile" column="mobile" nullValue=""/>
+    </resultMap>
+
+    <insert id="insertEmployee" parameterMap="insert-employee-param">
+        insert into
+        PRO_EMPLOYEE (EMPLOYEE_NAME, DEPT_ID, EMAIL, MOBILE, EMPLOYEE_ID)
+        values (?, ?, ?, ?, ?)
+    </insert>
+
+    <delete id="deleteEmployee">
+        delete from
+        PRO_EMPLOYEE
+        where EMPLOYEE_ID = #id#
+    </delete>
+
+    <update id="updateEmployee" parameterMap="insert-employee-param">
+        update PRO_EMPLOYEE
+        set EMPLOYEE_NAME = ?, DEPT_ID = ?, EMAIL = ?, MOBILE = ?
+        where EMPLOYEE_ID = ?
+    </update>
+
+    <select id="getEmployee" resultMap="get-employee-result">
+        select s.*, d.FULLNAME, d.SHORTNAME
+        from PRO_EMPLOYEE s left join PRO_DEPARTMENT d
+        on s.DEPT_ID = d.DEPT_ID
+        where s.EMPLOYEE_ID = #id#
+    </select>
+
+    <select id="getEmployees" parameterClass="java.util.Map" resultMap="get-employee-result">
+	      select *
+	      from(
+	        select
+		           row_number() over(
+		             <dynamic prepend="order by">
+		             <isNotEmpty property="sort">
+						$sort$
+			        </isNotEmpty>
+			        <isNotEmpty property="direction">
+			            $direction$
+			        </isNotEmpty>
+		             </dynamic> 
+		           ) as indexId, s.*, d.FULLNAME, d.SHORTNAME
+	        from PRO_EMPLOYEE s left join PRO_DEPARTMENT d
+	        on s.DEPT_ID = d.DEPT_ID
+	        <dynamic prepend="where">
+	            <isNotEmpty prepend="and" property="name">
+	                s.EMPLOYEE_NAME = #name#
+	            </isNotEmpty>
+	            <isNotEmpty prepend="and" property="departmentId">
+	                s.DEPT_ID = #departmentId#
+	            </isNotEmpty>
+	        </dynamic>
+          )as temp
+        <dynamic prepend="where">
+	        <isNotEmpty  property="firstResult">
+	        	  <![CDATA[ indexId > ]]>
+	              $firstResult$
+	        </isNotEmpty>
+	        <isNotEmpty  property="maxResults">
+	             FETCH FIRST $maxResults$ ROWS ONLY
+            </isNotEmpty> 
+        </dynamic>
+    </select>
+
+    <select id="countEmployees" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select count(s.EMPLOYEE_ID) 
+        from PRO_EMPLOYEE s left join PRO_DEPARTMENT d 
+        on s.DEPT_ID = d.DEPT_ID
+        <dynamic prepend="where">
+            <isNotEmpty prepend="and" property="name">
+                s.EMPLOYEE_NAME = #name#
+            </isNotEmpty>
+            <isNotEmpty prepend="and" property="departmentId">
+                s.DEPT_ID = #departmentId#
+            </isNotEmpty>
+        </dynamic>
+    </select>
+
+</sqlMap>

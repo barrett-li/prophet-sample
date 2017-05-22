@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+	default-autowire="byName" default-lazy-init="true">
+
+	<!--记录用户日志的AOP-->
+	<bean id="orgUserLog" class="com.resoft.prophet.log.aop.OrgUserLog">
+		<property name="logService">
+			<ref bean="logService" />
+		</property>
+	</bean>
+
+	<aop:config proxy-target-class="true">
+		<aop:aspect ref="orgUserLog">
+			<aop:pointcut id="writeOrgLogMethod"
+				expression="
+					execution(* com.resoft.prophet.org.service.*.insert*(..)) or 
+					execution(* com.resoft.prophet.org.service.*.delete*(..))
+				" />
+			<aop:around pointcut-ref="writeOrgLogMethod" method="writeLog" />
+		</aop:aspect>
+	</aop:config>
+
+</beans>

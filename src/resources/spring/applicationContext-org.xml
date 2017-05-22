@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd"
+	default-autowire="byName" default-lazy-init="true">
+
+	<bean id="departmentDAO" class="com.resoft.prophet.org.dao.DepartmentDAO">
+		<property name="sqlMapClient" ref="sqlMapClient" />
+	</bean>
+
+	<bean id="employeeDAO" class="com.resoft.prophet.org.dao.EmployeeDAO">
+		<property name="sqlMapClient" ref="sqlMapClient" />
+	</bean>
+
+	<bean id="orgService" class="com.resoft.prophet.org.service.OrgServiceImpl">
+		<property name="departmentDAO" ref="departmentDAO" />
+		<property name="employeeDAO" ref="employeeDAO" />
+		<property name="deptExistedExceptionMessage">
+			<value>${exception.org.deptExisted}</value>
+		</property>
+		<property name="deptHasEmployeeExceptionMessage">
+			<value>${exception.org.deptHasEmployee}</value>
+		</property>
+	</bean>
+
+	<bean id="orgDWRService" class="com.resoft.prophet.org.web.OrgDWRService">
+		<property name="orgService" ref="orgService" />
+	</bean>
+
+	<bean id="insertDeptAction" class="com.resoft.prophet.org.web.InsertDeptAction" scope="prototype">
+		<property name="orgService" ref="orgService" />
+	</bean>
+	
+	<bean id="deleteDeptAction" class="com.resoft.prophet.org.web.DeleteDeptAction" scope="prototype">
+		<property name="orgService" ref="orgService" />
+	</bean>
+	
+	<bean id="getDeptsAction" class="com.resoft.prophet.org.web.GetDeptsAction" scope="prototype">
+		<property name="orgService" ref="orgService" />
+	</bean>
+	
+	<bean id="getDeptAction" class="com.resoft.prophet.org.web.GetDeptAction" scope="prototype">
+		<property name="orgService" ref="orgService" />
+	</bean>
+	
+	<bean id="updateDeptAction" class="com.resoft.prophet.org.web.UpdateDeptAction" scope="prototype">
+		<property name="orgService" ref="orgService" />
+	</bean>
+	
+	<bean id="exprotExcelDeptsAction" class="com.resoft.prophet.org.web.ExprotExcelDeptsAction" scope="prototype">
+		<property name="orgService" ref="orgService" />
+	</bean>
+	
+</beans>

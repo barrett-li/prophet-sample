@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dwr PUBLIC "-//GetAhead Limited//DTD Direct Web Remoting 2.0//EN" "http://getahead.ltd.uk/dwr/dwr20.dtd">
+
+<dwr>
+	<allow>
+		<create creator="spring" javascript="orgDWRService">
+			<param name="beanName" value="orgDWRService" />
+		</create>
+
+		<convert converter="bean" match="com.resoft.prophet.org.domain.Department" />
+		<convert converter="bean" match="com.resoft.prophet.org.domain.Employee" />
+	</allow>
+	<signatures>
+		<![CDATA[
+			import java.util.Map;
+			
+			orgDWRService.getAllDeptsDataset(Integer, Integer, String, String, String, String, String, Map<String, String>);
+			orgDWRService.getDeptsDataset(Integer, Integer, String, String, String, String, String, Map<String, String>);
+			orgDWRService.getEmployeesDataset(Integer, Integer, String, String, String, String, String, Map<String, String>);
+		]]>
+	</signatures>
+</dwr>

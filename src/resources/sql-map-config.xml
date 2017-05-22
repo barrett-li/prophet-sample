@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+	<!-- Configure settings. -->
+	<settings 
+		cacheModelsEnabled="true" 
+		enhancementEnabled="true" 
+		errorTracingEnabled="true" 
+		lazyLoadingEnabled="true" 
+		maxRequests="32" 
+		maxSessions="10" 
+		maxTransactions="5"
+		useStatementNamespaces="true" />
+
+	<!-- 
+		- List the SQL Map XML files. They can be loaded from the 
+		- classpath, as they are here (com.domain.data...)
+	-->
+
+	<sqlMap resource="com/resoft/prophet/security/domain/map/Security.xml" />
+	<sqlMap resource="com/resoft/prophet/org/domain/map/Department.xml" />
+	<sqlMap resource="com/resoft/prophet/org/domain/map/Employee.xml" />
+	<sqlMap resource="com/resoft/prophet/log/domain/map/UserLog.xml" />
+	<sqlMap resource="com/resoft/prophet/log/domain/map/SystemLog.xml" />
+	<sqlMap resource="com/resoft/prophet/charts/sample/domain/map/BankLoan.xml" />
+	
+</sqlMapConfig>
